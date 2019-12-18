@@ -1,13 +1,13 @@
-export const updateBoard = (board, indexRow, indexGrid) => {
+export const updateBoard = (board, indexRow, indexSquare) => {
   const boardUpdated = [
     ...board.slice(0, indexRow),
     [
-      ...board[indexRow].slice(0, indexGrid),
+      ...board[indexRow].slice(0, indexSquare),
       {
         active: false,
         enabled: true
       },
-      ...board[indexRow].slice(indexGrid + 1 ),
+      ...board[indexRow].slice(indexSquare + 1 ),
     ],
     ...board.slice(indexRow + 1)
   ];

@@ -1,82 +1,107 @@
-import React from 'react';
-import { useEffect, useState } from 'react';
-import ArrowKeysReact from 'arrow-keys-react';
-import { useDispatch, useSelector } from 'react-redux'
+  import React from 'react';
+  import { useEffect, useState } from 'react';
+  import ArrowKeysReact from 'arrow-keys-react';
+  import { useDispatch, useSelector } from 'react-redux'
+  import { useAlert } from "react-alert";
 
-import Grid from './components/Grid';
-import { actionCreators } from '../../redux/Board/actions';
-import './Board.css';
+  import { actions } from '../../redux/Board/actions';
+  import Square from './components/Square';
+  import { actionCreators } from '../../redux/Board/actions';
+  import { RIGHT, LEFT, UP, DOWN, MESSAGE_SUCCESS } from './constants';
+  import './Board.css';
 
-function Board() {
-  const dispatch = useDispatch();
-  const [ start, setStart ] = useState(false);
-  const board = useSelector(state => state.board.board);
-  const wind = useSelector(state => state.board.wind);
-  const indexRow = useSelector(state => state.board.indexRow);
-  const indexGrid = useSelector(state => state.board.indexGrid);
-  const lastIndexRow = useSelector(state => state.board.lastIndexRow);
-  const lastIndexGrid = useSelector(state => state.board.lastIndexGrid);
+  function Board() {
+    const dispatch = useDispatch();
+    const alert = useAlert();
+    const [ start, setStart ] = useState(false);
+    const [ disableButtons, setDisableButtons ] = useState(false);
+    const board = useSelector(state => state.board.board);
+    const finalized = useSelector(state => state.board.finalized);
+    const indexRow = useSelector(state => state.board.indexRow);
+    const indexSquare = useSelector(state => state.board.indexSquare);
+    const position = useSelector(state => state.board.position);
 
-  useEffect(() => {
-    if (start) {
-      setTimeout(handleOnClick, 200);
-    }
-  });
-
-  useEffect(() => {
-    ArrowKeysReact.config({
-      left: () => {
-        board[indexRow][indexGrid - 1].enabled && dispatch(actionCreators.move('LEFT'));
-      },
-      right: () => {
-        board[indexRow][indexGrid + 1].enabled && dispatch(actionCreators.move('RIGHT'));
-      },
-      up: () => {
-        board[indexRow - 1][indexGrid].enabled && dispatch(actionCreators.move('UP'));
-      },
-      down: () => {
-        board[indexRow + 1][indexGrid].enabled && dispatch(actionCreators.move('DOWN'));
+    useEffect(() => {
+      if (start) {
+        setTimeout(handleOnClick, 150);
       }
     });
-  });
 
-  const handleOnClick = () => {
-    if(!wind) {
-      if(!start) { setStart(true) }
-      if(board[indexRow][indexGrid + 1].enabled && 
-        ((board[indexRow - 1] && board[indexRow - 1][indexGrid].enabled) || board[indexRow + 1][indexGrid + 1].enabled || board[indexRow][indexGrid + 2].enabled )) {
-        dispatch(actionCreators.move('RIGHT'));
-        return;
-      }
-      if(indexRow !== 0 && lastIndexRow !== indexRow - 1) {
-        if(board[indexRow - 1] && board[indexRow - 1][indexGrid].enabled){
-          dispatch(actionCreators.move('UP'));
+    useEffect(() => {
+      ArrowKeysReact.config({
+        left: () => {
+          board[indexRow][indexSquare - 1].enabled && dispatch(actionCreators.move(LEFT));
+        },
+        right: () => {
+          if(!finalized) {
+            board[indexRow][indexSquare + 1].enabled && dispatch(actionCreators.move(RIGHT))
+          } else {
+            alert.success(MESSAGE_SUCCESS);
+            dispatch({ type: actions.RESET });
+          }
+        },
+        up: () => {
+          board[indexRow - 1][indexSquare].enabled && dispatch(actionCreators.move(UP));
+        },
+        down: () => {
+          board[indexRow + 1][indexSquare].enabled && dispatch(actionCreators.move(DOWN));
+        }
+      });
+    });
+
+    const handleOnClick = () => {
+      if(!finalized) {
+        if(!start) { setStart(true) }
+        setDisableButtons(true);
+        if (position === RIGHT && board[indexRow][indexSquare + 1].enabled) {
+          dispatch(actionCreators.move(RIGHT));
           return;
         }
+        if ((board[indexRow + 1][indexSquare].enabled) && (position !== UP)) {
+          dispatch(actionCreators.move(DOWN));
+          return;
+        } else if (board[indexRow][indexSquare - 1].enabled && (position !== RIGHT || position === LEFT)) {
+          dispatch(actionCreators.move(LEFT));
+          return;
+        } else if (board[indexRow][indexSquare + 1].enabled) {
+          dispatch(actionCreators.move(RIGHT));
+          return;
+        }
+        if (board[indexRow - 1] && board[indexRow - 1][indexSquare].enabled){
+          dispatch(actionCreators.move(UP));
+          return;
+        } else if (board[indexRow][indexSquare - 1].enabled) {
+          dispatch(actionCreators.move(LEFT));
+          return;
+        }
+      } else {
+        setStart(false);
+        dispatch({ type: actions.RESET });
+        setDisableButtons(false);
+        alert.success(MESSAGE_SUCCESS);
       }
-      if(board[indexRow + 1][indexGrid].enabled || indexRow === 0) {
-        dispatch(actionCreators.move('DOWN'));
-        return;
-      }
-      if(board[indexRow + 1][indexGrid - 1].enabled && board[indexRow] && board[indexRow][indexGrid - 1].enabled) {
-        dispatch(actionCreators.move('LEFT'));
-        return;
-      }
+    };
+
+    const handleOnReset = () => {
+      dispatch({ type: actions.RESET });
+      setStart(false);
     }
-  };
 
-  return (
-    <div className="board" {...ArrowKeysReact.events} tabIndex="1">
-      <button className="help" onClick={handleOnClick}>Pidele ayuda a la aguilas</button>
-      {board && board.map((row, i) => (
-        <div key={i} className="row">
-          {row && row.map((grid, i) =>
-            <Grid key={i} enabled={grid.enabled} active={grid.active} />
-          )}
+    return (
+      <div className="board" {...ArrowKeysReact.events} tabIndex="1">
+        <div className="container-button">
+          <button className="help" onClick={handleOnClick} disabled={disableButtons}>Pídele ayuda a la aguilas</button>
+          <button className="reset" onClick={handleOnReset} disabled={disableButtons}>Resetear</button>
         </div>
-      ))}
-    </div>
-  );
-}
+        {board && board.map((row, i) => (
+          <div key={i} className="row">
+            {row && row.map((square, i) =>
+              <Square key={i} enabled={square.enabled} active={square.active} />
+            )}
+          </div>
+        ))}
+      </div>
+    );
+  }
 
-export default Board;
+  export default Board;

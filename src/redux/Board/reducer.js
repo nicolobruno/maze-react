@@ -1,90 +1,72 @@
-import PropTypes from 'prop-types';
 import Immutable from 'seamless-immutable';
 
+import { actions } from './actions';
 import { matrix } from '../../constants';
+import { resetPosition, checkFinalized } from './utils';
+import { UP, DOWN, LEFT, RIGHT } from '../../components/Board/constants';
 
 const defaultState = {
   moves: 0,
   board: matrix,
-  indexGrid: matrix[0].findIndex(elem => elem.active),
+  indexSquare: matrix[0].findIndex(elem => elem.active),
   indexRow: 0,
-  lastIndexGrid: 0,
-  lastIndexRow: 0
+  finalized: false
 };
-
-const resetPosition = ( board, indexGrid, indexRow ) => {
-  const boardUpdated = [
-    ...board.slice(0, indexRow),
-    [
-      ...board[indexRow].slice(0, indexGrid),
-      {
-        active: false,
-        enabled: true
-      },
-      ...board[indexRow].slice(indexGrid + 1 ),
-    ],
-    ...board.slice(indexRow + 1)
-  ];
-  return boardUpdated;
-}
 
 export function reducer(state = Immutable(defaultState), action) {
   switch (action.type) {
-    case 'MOVE_DOWN': {
-      const indexGrid = state.indexGrid;
-      const indexRow = state.indexRow;
-      const resetBoard = resetPosition(state.board, indexGrid, indexRow);
+    case actions.MOVE_DOWN: {
+      const { indexSquare, indexRow, board } = state;
+      const resetBoard = resetPosition(board, indexSquare, indexRow);
       const boardUpdated = [
         ...resetBoard.slice(0, indexRow + 1),
         [
-          ...resetBoard[indexRow + 1].slice(0, indexGrid),
-          resetBoard[indexRow + 1][indexGrid].merge({active: true}),
-          ...resetBoard[indexRow + 1].slice(indexGrid + 1 ),
+          ...resetBoard[indexRow + 1].slice(0, indexSquare),
+          resetBoard[indexRow + 1][indexSquare].merge({active: true}),
+          ...resetBoard[indexRow + 1].slice(indexSquare + 1 ),
         ],
         ...resetBoard.slice(indexRow + 2)
       ];
       return state.merge({
         moves: state.moves + 1,
         board: boardUpdated,
-        lastIndexRow: indexRow,
-        lastIndexGrid: indexGrid,
         indexRow: indexRow + 1,
-        indexGrid: indexGrid
+        indexSquare: indexSquare,
+        position: DOWN,
+        finalized: checkFinalized(board, indexRow, indexSquare)
       });
     }
-    case 'MOVE_RIGHT': {
-      const indexGrid = state.indexGrid;
-      const indexRow = state.indexRow;
-      const resetBoard = resetPosition(state.board, indexGrid, indexRow);
+    case actions.MOVE_RIGHT: {
+      const { indexSquare, indexRow, board } = state;
+      const resetBoard = resetPosition(board, indexSquare, indexRow);
       const boardUpdated = [
         ...resetBoard.slice(0, indexRow),
         [
-          ...resetBoard[indexRow].slice(0, indexGrid + 1),
-          resetBoard[indexRow][indexGrid + 1].merge({active: true}),
-          ...resetBoard[indexRow].slice(indexGrid + 2),
+          ...resetBoard[indexRow].slice(0, indexSquare + 1),
+          resetBoard[indexRow][indexSquare + 1].merge({active: true}),
+          ...resetBoard[indexRow].slice(indexSquare + 2),
         ],
         ...resetBoard.slice(indexRow + 1)
       ];
       return state.merge({
         moves: state.moves + 1,
         board: boardUpdated,
-        indexGrid: indexGrid + 1,
-        lastIndexGrid: indexGrid,
-        lastIndexRow: indexRow,
-        indexRow: indexRow
+        indexSquare: indexSquare + 1,
+        indexRow: indexRow,
+        position: RIGHT,
+        finalized: checkFinalized(board, indexRow, indexSquare)
       });
     }
-    case 'MOVE_UP': {
-      const indexGrid = state.indexGrid;
-      const indexRow = state.indexRow;
-      const resetBoard = resetPosition(state.board, indexGrid, indexRow);
+    case actions.MOVE_UP: {
+      const { indexSquare, indexRow, board } = state;
+      const resetBoard = resetPosition(board, indexSquare, indexRow);
       const boardUpdated = [
         ...resetBoard.slice(0, indexRow - 1),
         [
-          ...resetBoard[indexRow - 1].slice(0, indexGrid),
-          resetBoard[indexRow - 1][indexGrid].merge({active: true}),
+          ...resetBoard[indexRow - 1].slice(0, indexSquare),
+          resetBoard[indexRow - 1][indexSquare].merge({active: true}),
 
-          ...resetBoard[indexRow - 1].slice(indexGrid + 1),
+          ...resetBoard[indexRow - 1].slice(indexSquare + 1),
         ],
         ...resetBoard.slice(indexRow)
       ];
@@ -92,22 +74,21 @@ export function reducer(state = Immutable(defaultState), action) {
         moves: state.moves + 1,
         board: boardUpdated,
         indexRow: state.indexRow - 1,
-        lastIndexRow: state.indexRow,
-        indexGrid: indexGrid,
-        lastIndexGrid: indexGrid
+        indexSquare: indexSquare,
+        position: UP,
+        finalized: checkFinalized(board, indexRow, indexSquare)
       });
     }
-    case 'MOVE_LEFT': {
-      const indexGrid = state.indexGrid;
-      const indexRow = state.indexRow;
-      const resetBoard = resetPosition(state.board, indexGrid, indexRow);
+    case actions.MOVE_LEFT: {
+      const { indexSquare, indexRow, board } = state;
+      const resetBoard = resetPosition(board, indexSquare, indexRow);
       const boardUpdated = [
         ...resetBoard.slice(0, indexRow),
         [
-          ...resetBoard[indexRow].slice(0, indexGrid - 1),
-          resetBoard[indexRow][indexGrid - 1].merge({active: true}),
+          ...resetBoard[indexRow].slice(0, indexSquare - 1),
+          resetBoard[indexRow][indexSquare - 1].merge({active: true}),
 
-          ...resetBoard[indexRow].slice(indexGrid),
+          ...resetBoard[indexRow].slice(indexSquare),
         ],
         ...resetBoard.slice(indexRow + 1)
       ];
@@ -115,23 +96,22 @@ export function reducer(state = Immutable(defaultState), action) {
         moves: state.moves + 1,
         board: boardUpdated,
         indexRow: indexRow,
-        lastIndexRow: indexRow,
-        indexGrid: indexGrid - 1,
-        lastIndexGrid: indexGrid
+        indexSquare: indexSquare - 1,
+        position: LEFT,
+        finalized: checkFinalized(board, indexRow, indexSquare)
       });
     }
+    case actions.RESET: {
+      return state.merge({
+        moves: 0,
+        indexSquare: matrix[0].findIndex(elem => elem.active),
+        indexRow: 0,
+        board: matrix,
+        finalized: false
+      })
+    }
     default: {
-      return state;
+      return state; 
     }
   }
-}
-
-export function propTypes() {
-  return {
-    board: PropTypes.shape({
-      message: PropTypes.string.isRequired,
-      type: PropTypes.oneOf(['info', 'error', 'success']).isRequired,
-      title: PropTypes.string
-    })
-  };
 }

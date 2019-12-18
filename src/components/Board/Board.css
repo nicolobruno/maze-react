@@ -4,6 +4,8 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  border: none;
+  outline:none;
 }
 
 .row {
@@ -17,4 +19,20 @@
   height: 40px;
   width: 180px;
   font-size: 14px;
+  border: solid grey 1px;
+  outline:none;
+}
+
+.reset {
+  margin: 0 10px 10px;
+  border-radius: 15px;
+  font-size: 14px;
+  border: solid grey 1px;
+  outline:none;
+}
+
+.container-button {
+  display: flex;
+  flex-direction: row;
+  margin-bottom: 10px;
 }
