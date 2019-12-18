@@ -1,19 +1,7 @@
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
-## Component generic Graphic to using react-chartjs-2
-
-The component receives the props `type` for the type of graphic, `data` that has the graphic information, `width` and `height`. The `options` key includes other customizable stuff like tooltips, labels, axes, and more. information, `width` and `height`. The `options` key includes other customizable stuff like tooltips, labels, axes, and more.
-
-
-**Props**
-
-| Property | Type | Required? | Description |
-|:---|:---|:---:|:---|
-| type | String | | Specifies the graphic type |
-| data | object |✓| Specifies the data |
-| width | Number | | Specifies the width |
-| heigth | Number | | Specifies the type |
-
+## Maze React
+![all text](https://user-images.githubusercontent.com/28309103/71133142-7357ae00-21d8-11ea-908d-baefed7fa30d.png)
 ## Demo & Examples
 
 To build the examples locally, run:
