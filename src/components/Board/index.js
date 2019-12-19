@@ -8,18 +8,18 @@
   import Square from './components/Square';
   import { actionCreators } from '../../redux/Board/actions';
   import { RIGHT, LEFT, UP, DOWN, MESSAGE_SUCCESS } from './constants';
+  import { canGoUp, canGoDown, canGoRight, canGoLeft } from './utils';
   import './Board.css';
 
   function Board() {
+
     const dispatch = useDispatch();
     const alert = useAlert();
+
     const [ start, setStart ] = useState(false);
     const [ disableButtons, setDisableButtons ] = useState(false);
-    const board = useSelector(state => state.board.board);
-    const finalized = useSelector(state => state.board.finalized);
-    const indexRow = useSelector(state => state.board.indexRow);
-    const indexSquare = useSelector(state => state.board.indexSquare);
-    const position = useSelector(state => state.board.position);
+
+    const { board, position, finalized, indexRow, indexSquare, moves } = useSelector(state => state.board);
 
     useEffect(() => {
       if (start) {
@@ -30,52 +30,53 @@
     useEffect(() => {
       ArrowKeysReact.config({
         left: () => {
-          board[indexRow][indexSquare - 1].enabled && dispatch(actionCreators.move(LEFT));
+          canGoLeft(board, indexRow, indexSquare) && dispatch(actionCreators.move(LEFT));
         },
         right: () => {
           if(!finalized) {
-            board[indexRow][indexSquare + 1].enabled && dispatch(actionCreators.move(RIGHT))
+            canGoRight(board, indexRow, indexSquare) && dispatch(actionCreators.move(RIGHT))
           } else {
             alert.success(MESSAGE_SUCCESS);
             dispatch({ type: actions.RESET });
           }
         },
         up: () => {
-          board[indexRow - 1][indexSquare].enabled && dispatch(actionCreators.move(UP));
+          indexRow > 0 && canGoUp(board, indexRow, indexSquare) && dispatch(actionCreators.move(UP));
         },
         down: () => {
-          board[indexRow + 1][indexSquare].enabled && dispatch(actionCreators.move(DOWN));
+          canGoDown(board, indexRow, indexSquare) && dispatch(actionCreators.move(DOWN));
         }
       });
     });
 
     const handleOnClick = () => {
       if(!finalized) {
-        if(!start) { setStart(true) }
+        !start && setStart(true);
         setDisableButtons(true);
-        if (position === RIGHT && board[indexRow][indexSquare + 1].enabled) {
+        if (position === RIGHT && canGoRight(board, indexRow, indexSquare)) {
           dispatch(actionCreators.move(RIGHT));
           return;
         }
-        if ((board[indexRow + 1][indexSquare].enabled) && (position !== UP)) {
+        if ((canGoDown(board, indexRow, indexSquare)) && (position !== UP)) {
           dispatch(actionCreators.move(DOWN));
           return;
-        } else if (board[indexRow][indexSquare - 1].enabled && (position !== RIGHT || position === LEFT)) {
+        } else if (canGoLeft(board, indexRow, indexSquare) && (position !== RIGHT || position === LEFT)) {
           dispatch(actionCreators.move(LEFT));
           return;
-        } else if (board[indexRow][indexSquare + 1].enabled) {
+        } else if (canGoRight(board, indexRow, indexSquare)) {
           dispatch(actionCreators.move(RIGHT));
           return;
         }
-        if (board[indexRow - 1] && board[indexRow - 1][indexSquare].enabled){
+        if (canGoUp(board, indexRow, indexSquare)){
           dispatch(actionCreators.move(UP));
           return;
-        } else if (board[indexRow][indexSquare - 1].enabled) {
+        } else if (canGoLeft(board, indexRow, indexSquare)) {
           dispatch(actionCreators.move(LEFT));
           return;
         }
       } else {
         setStart(false);
+        dispatch(actionCreators.notifyMoves(moves))
         dispatch({ type: actions.RESET });
         setDisableButtons(false);
         alert.success(MESSAGE_SUCCESS);
