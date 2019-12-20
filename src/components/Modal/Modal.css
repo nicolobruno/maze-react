@@ -1,10 +1,10 @@
 .modal-container {
-  background: #e5e3e3;
+  background: #f4efef;
   position: fixed;
   top: 15%;
-  margin-left: 15px;
+  margin-left: 18px;
   width: 300px;
-  height: 400px;
+  height: 450px;
   max-height: 100%;
   max-width: 100%;
   border-radius: 20px;
@@ -41,6 +41,7 @@
 
 .title {
   color: cornflowerblue;
+  margin: auto;
 }
 
 .text {

@@ -10,7 +10,8 @@ const defaultState = {
   board: matrix,
   indexSquare: matrix[0].findIndex(elem => elem.active),
   indexRow: 0,
-  finalized: false
+  finalized: false,
+  position: DOWN
 };
 
 export function reducer(state = Immutable(defaultState), action) {
@@ -27,13 +28,13 @@ export function reducer(state = Immutable(defaultState), action) {
         ],
         ...resetBoard.slice(indexRow + 2)
       ];
+      debugger
       return state.merge({
         moves: state.moves + 1,
         board: boardUpdated,
         indexRow: indexRow + 1,
         indexSquare: indexSquare,
-        position: DOWN,
-        finalized: checkFinalized(board, indexRow, indexSquare)
+        position: DOWN
       });
     }
     case actions.MOVE_RIGHT: {
@@ -54,7 +55,7 @@ export function reducer(state = Immutable(defaultState), action) {
         indexSquare: indexSquare + 1,
         indexRow: indexRow,
         position: RIGHT,
-        finalized: checkFinalized(board, indexRow, indexSquare)
+        finalized: checkFinalized(board, indexRow, indexSquare + 1)
       });
     }
     case actions.MOVE_UP: {
@@ -75,8 +76,7 @@ export function reducer(state = Immutable(defaultState), action) {
         board: boardUpdated,
         indexRow: state.indexRow - 1,
         indexSquare: indexSquare,
-        position: UP,
-        finalized: checkFinalized(board, indexRow, indexSquare)
+        position: UP
       });
     }
     case actions.MOVE_LEFT: {

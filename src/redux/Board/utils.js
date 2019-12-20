@@ -24,4 +24,4 @@ export const resetPosition = ( board, indexSquare, indexRow ) => {
   return boardUpdated;
 }
 
-export const checkFinalized = (board, indexRow, indexSquare) => board[indexRow][indexSquare + 2] === undefined;
+export const checkFinalized = (board, indexRow, indexSquare) => board[indexRow][indexSquare + 1] === undefined;

@@ -9,7 +9,6 @@ import Head from './components/Head';
 const options = {
   timeout: 5000,
   position: positions.TOP_CENTER,
-  containerStyle: { width: 400, height: 300 }
 };
 
 function App() {

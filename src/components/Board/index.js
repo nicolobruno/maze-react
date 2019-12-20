@@ -8,11 +8,10 @@
   import Square from './components/Square';
   import { actionCreators } from '../../redux/Board/actions';
   import { RIGHT, LEFT, UP, DOWN, MESSAGE_SUCCESS } from './constants';
-  import { canGoUp, canGoDown, canGoRight, canGoLeft } from './utils';
+  import { canGoUp, canGoDown, canGoRight, canGoLeft, checkMove } from './utils';
   import './Board.css';
 
   function Board() {
-
     const dispatch = useDispatch();
     const alert = useAlert();
 
@@ -23,7 +22,7 @@
 
     useEffect(() => {
       if (start) {
-        setTimeout(handleOnClick, 150);
+        setTimeout(handleOnClick, 100);
       }
     });
 
@@ -36,7 +35,7 @@
           if(!finalized) {
             canGoRight(board, indexRow, indexSquare) && dispatch(actionCreators.move(RIGHT))
           } else {
-            alert.success(MESSAGE_SUCCESS);
+            alert.success(`${MESSAGE_SUCCESS} ${moves} movimientos`);
             dispatch({ type: actions.RESET });
           }
         },
@@ -53,33 +52,13 @@
       if(!finalized) {
         !start && setStart(true);
         setDisableButtons(true);
-        if (position === RIGHT && canGoRight(board, indexRow, indexSquare)) {
-          dispatch(actionCreators.move(RIGHT));
-          return;
-        }
-        if ((canGoDown(board, indexRow, indexSquare)) && (position !== UP)) {
-          dispatch(actionCreators.move(DOWN));
-          return;
-        } else if (canGoLeft(board, indexRow, indexSquare) && (position !== RIGHT || position === LEFT)) {
-          dispatch(actionCreators.move(LEFT));
-          return;
-        } else if (canGoRight(board, indexRow, indexSquare)) {
-          dispatch(actionCreators.move(RIGHT));
-          return;
-        }
-        if (canGoUp(board, indexRow, indexSquare)){
-          dispatch(actionCreators.move(UP));
-          return;
-        } else if (canGoLeft(board, indexRow, indexSquare)) {
-          dispatch(actionCreators.move(LEFT));
-          return;
-        }
+        checkMove(board, indexRow, indexSquare, position, dispatch);
       } else {
         setStart(false);
         dispatch(actionCreators.notifyMoves(moves))
         dispatch({ type: actions.RESET });
         setDisableButtons(false);
-        alert.success(MESSAGE_SUCCESS);
+        alert.success(`${MESSAGE_SUCCESS} ${moves} movimientos`);
       }
     };
 
