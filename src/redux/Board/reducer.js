@@ -28,7 +28,6 @@ export function reducer(state = Immutable(defaultState), action) {
         ],
         ...resetBoard.slice(indexRow + 2)
       ];
-      debugger
       return state.merge({
         moves: state.moves + 1,
         board: boardUpdated,
@@ -98,7 +97,7 @@ export function reducer(state = Immutable(defaultState), action) {
         indexRow: indexRow,
         indexSquare: indexSquare - 1,
         position: LEFT,
-        finalized: checkFinalized(board, indexRow, indexSquare)
+        finalized: checkFinalized(board, indexRow, indexSquare - 1)
       });
     }
     case actions.RESET: {
