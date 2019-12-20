@@ -1,7 +1,7 @@
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Maze React
-![all text](https://user-images.githubusercontent.com/28309103/71133142-7357ae00-21d8-11ea-908d-baefed7fa30d.png)
+![all text](https://user-images.githubusercontent.com/28309103/71231412-919ed600-22cc-11ea-9cd4-c7be3781a92b.png)
 ## Demo & Examples
 
 To build the examples locally, run:
