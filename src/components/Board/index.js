@@ -75,8 +75,8 @@
         </div>
         {board && board.map((row, i) => (
           <div key={i} className="row">
-            {row && row.map((square, i) =>
-              <Square key={i} enabled={square.enabled} active={square.active} />
+            {row && row.map((square) =>
+              <Square key={`${square.row}-${square.id}`} enabled={square.enabled} active={square.active} />
             )}
           </div>
         ))}

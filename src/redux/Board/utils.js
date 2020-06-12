@@ -14,6 +14,8 @@ export const resetPosition = ( board, indexSquare, indexRow ) => {
     [
       ...board[indexRow].slice(0, indexSquare),
       {
+        id: board[indexRow][indexSquare].id,
+        row: board[indexRow][indexSquare].row,
         active: false,
         enabled: true
       },
