@@ -1,5 +1,4 @@
-  import React from 'react';
-  import { useEffect, useState } from 'react';
+  import React, { useEffect, useState, useCallback } from 'react';
   import ArrowKeysReact from 'arrow-keys-react';
   import { useDispatch, useSelector } from 'react-redux'
   import { useAlert } from "react-alert";
@@ -19,7 +18,7 @@
     const [ disableButtons, setDisableButtons ] = useState(false);
 
     const { board, position, finalized, indexRow, indexSquare, moves } = useSelector(state => state.board);
-
+    
     useEffect(() => {
       if (start) {
         setTimeout(handleOnClick, 100);
@@ -48,7 +47,7 @@
       });
     });
 
-    const handleOnClick = () => {
+    const handleOnClick = useCallback(() => {
       if(!finalized) {
         !start && setStart(true);
         setDisableButtons(true);
@@ -60,12 +59,12 @@
         setDisableButtons(false);
         alert.success(`${MESSAGE_SUCCESS} ${moves} movimientos`);
       }
-    };
+    }, [finalized, start, dispatch, alert, board, indexRow, indexSquare, position, moves]);
 
-    const handleOnReset = () => {
+    const handleOnReset = useCallback(() => {
       dispatch({ type: actions.RESET });
       setStart(false);
-    }
+    }, [dispatch])
 
     return (
       <div className="board" {...ArrowKeysReact.events} tabIndex="1">
