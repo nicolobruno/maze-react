@@ -12,6 +12,6 @@ Then open [`localhost:8000`](http://localhost:8000) in a browser.
 ## Maze React
 
 ## Demo & Examples
-![all text](https://user-images.githubusercontent.com/28309103/71231412-919ed600-22cc-11ea-9cd4-c7be3781a92b.png)
+![all text](https://user-images.githubusercontent.com/28309103/84573317-23683700-ad76-11ea-9ae0-4e74c7ddab49.png)
 
 
