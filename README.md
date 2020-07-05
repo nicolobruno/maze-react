@@ -11,6 +11,9 @@ Then open [`localhost:8000`](http://localhost:8000) in a browser.
 
 ## Maze React
 
+Help to Gandalf get out of sight of Sauron.
+You can resolve the maze automatically or move it Gandalf with the arrows.
+
 Visit https://maze-react.vercel.app/
 
 ## Demo & Examples
